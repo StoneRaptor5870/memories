@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AppBar, Typography, Toolbar, Avatar, Button } from "@material-ui/core";
+import { AppBar, Typography, Toolbar, Avatar, Button, Hidden } from "@material-ui/core";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import decode from "jwt-decode";
@@ -23,8 +23,6 @@ const Navbar = () => {
   };
 
   useEffect(() => {
-    const decodedCredential = user?.decodedCredential;
-
     const token = user?.token;
 
     if (token) {
@@ -38,13 +36,10 @@ const Navbar = () => {
   return (
     <AppBar className={classes.appBar} position="static" color="inherit">
       <Link to="/" className={classes.brandContainer}>
-        <img src={memoriesText} alt="icon" height="45px" />
-        <img
-          className={classes.image}
-          src={memories}
-          alt="icon"
-          height="50px"
-        />
+        <Hidden smDown>
+          <img src={memoriesText} alt="icon" height="45px" />
+        </Hidden>
+        <img className={classes.image} src={memories} alt="icon" height="50px" />
       </Link>
       <Toolbar className={classes.toolbar}>
         {user ? (
@@ -54,12 +49,11 @@ const Navbar = () => {
               alt={user?.decodedCredential?.name || user?.result?.name}
               src={user?.decodedCredential?.picture}
             >
-              {user?.decodedCredential?.name.charAt(0) ||
-                user?.result?.name.charAt(0)}
+              {user?.decodedCredential?.name.charAt(0) || user?.result?.name.charAt(0)}
             </Avatar>
-            <Typography className={classes.userName} variant="h6">
+            {/* <Typography className={classes.userName} variant="h6">
               {user?.decodedCredential?.name || user?.result?.name}
-            </Typography>
+            </Typography> */}
             <Button
               variant="contained"
               className={classes.logout}
@@ -70,12 +64,7 @@ const Navbar = () => {
             </Button>
           </div>
         ) : (
-          <Button
-            component={Link}
-            to="/auth"
-            variant="contained"
-            color="primary"
-          >
+          <Button component={Link} to="/auth" variant="contained" color="primary">
             Sign In
           </Button>
         )}

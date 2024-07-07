@@ -16,7 +16,7 @@ export default makeStyles((theme) => ({
     textDecoration: "none",
   },
   image: {
-    marginLeft: "15px",
+    marginLeft: "10px",
   },
   toolbar: {
     display: "flex",
@@ -26,7 +26,7 @@ export default makeStyles((theme) => ({
   profile: {
     display: "flex",
     justifyContent: "space-between",
-    width: "400px",
+    gap: "100px"
   },
   userName: {
     display: "flex",
@@ -35,6 +35,7 @@ export default makeStyles((theme) => ({
   brandContainer: {
     display: "flex",
     alignItems: "center",
+    flexDirection: "row"
   },
   purple: {
     color: theme.palette.getContrastText(deepPurple[500]),
