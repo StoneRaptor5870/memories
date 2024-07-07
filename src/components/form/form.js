@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { TextField, Button, Typography, Paper } from "@material-ui/core";
 import { useDispatch, useSelector } from "react-redux";
-import FileBase from "react-file-base64";
 import { useNavigate } from "react-router-dom";
 
 import useStyles from "./styles";
 import { createPost, updatePost } from "../../actions/posts";
-//import { updatePost } from "../../api";
 
 const Form = ({ currentId, setCurrentId }) => {
   const [postData, setPostData] = useState({
@@ -15,6 +13,7 @@ const Form = ({ currentId, setCurrentId }) => {
     tags: "",
     selectedFile: "",
   });
+  const [selectedFile, setSelectedFile] = useState(null);
   const post = useSelector((state) =>
     currentId
       ? state.posts.posts.find((message) => message._id === currentId)
@@ -23,7 +22,7 @@ const Form = ({ currentId, setCurrentId }) => {
   const dispatch = useDispatch();
   const classes = useStyles();
   const user = JSON.parse(localStorage.getItem("profile"));
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!post?.title) clear();
@@ -38,30 +37,24 @@ const Form = ({ currentId, setCurrentId }) => {
       tags: "",
       selectedFile: "",
     });
+    setSelectedFile(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const formData = new FormData();
+    formData.append("title", postData.title);
+    formData.append("message", postData.message);
+    formData.append("tags", postData.tags);
+    formData.append("selectedFile", selectedFile);
+    formData.append("name", user?.result?.name);
 
     if (currentId) {
-      dispatch(
-        updatePost(currentId, { ...postData, name: user?.result?.name })
-      );
-      clear();
+      dispatch(updatePost(currentId, formData));
     } else {
-      dispatch(createPost({ ...postData, name: user?.result?.name }, Navigate));
-      clear();
+      dispatch(createPost(formData, navigate));
     }
-    // if (currentId === 0) {
-    //   dispatch(createPost({ ...postData, name: user?.result?.name }, Navigate));
-    //   clear();
-    // } else {
-    //   dispatch(
-    //     updatePost(currentId, { ...postData, name: user?.result?.name })
-    //   );
-    //   clear();
-    // }
-    //window.location.reload();
+    clear();
   };
 
   if (!user?.result?.name) {
@@ -85,16 +78,6 @@ const Form = ({ currentId, setCurrentId }) => {
         <Typography variant="h6">
           {currentId ? `Editing "${post.title}"` : "Creating a Memory"}
         </Typography>
-        {/* <TextField
-          name="creator"
-          variant="outlined"
-          label="Creator"
-          fullWidth
-          value={postData.creator}
-          onChange={(e) =>
-            setPostData({ ...postData, creator: e.target.value })
-          }
-        /> */}
         <TextField
           name="title"
           variant="outlined"
@@ -118,7 +101,7 @@ const Form = ({ currentId, setCurrentId }) => {
         <TextField
           name="tags"
           variant="outlined"
-          label="Tags (coma separated)"
+          label="Tags (comma separated)"
           fullWidth
           value={postData.tags}
           onChange={(e) =>
@@ -126,12 +109,9 @@ const Form = ({ currentId, setCurrentId }) => {
           }
         />
         <div className={classes.fileInput}>
-          <FileBase
+          <input
             type="file"
-            multiple={false}
-            onDone={({ base64 }) =>
-              setPostData({ ...postData, selectedFile: base64 })
-            }
+            onChange={(e) => setSelectedFile(e.target.files[0])}
           />
         </div>
         <Button

@@ -5,9 +5,9 @@ import { useDispatch } from "react-redux";
 import useStyles from "./styles";
 import { commentPost } from "../../actions/posts";
 
-const CommentSection = ({post}) => {
+const CommentSection = ({ post, reloadPost }) => {
     const classes = useStyles();
-    const [comments, setComments] = useState([post?.comments]);
+    const [comments, setComments] = useState(post?.comments || []);
     const [comment, setComment] = useState("");
     const dispatch = useDispatch();
     const user = JSON.parse(localStorage.getItem("profile"));
@@ -19,23 +19,19 @@ const CommentSection = ({post}) => {
         setComment("");
         setComments(newComments);
         commentsRef.current.scrollIntoView();
+        reloadPost(); // Invoke the callback to reload the post after comment addition
     }; 
 
     return (
         <div className={classes.commentsOuterContainer}>
             <div className={classes.commentsInnerContainer}>
                 <Typography gutterBottom variant="h6">Comments</Typography>
-                {/* {comments.map((c, i) => (
+                {comments.map((c, i) => (
                     <Typography key={i} gutterBottom variant="subtitle1">
-                        <strong>{c.toString().split(": ")[0]}</strong>
-                        {c.toString().split(":")[1]}
+                        <strong>{c.split(": ")[0]}</strong>
+                        {c.split(": ")[1]}
                     </Typography>
-                ))} */}
-                <Typography className={classes.textBox} gutterBottom variant="subtitle1">
-                    {Object.keys(comments).map(function(key) {
-                        return ( <Typography value={key}>{comments[key]}</Typography> )
-                    })}
-                </Typography>
+                ))}
                 <div ref={commentsRef}/>
             </div>
             {user?.result?.name && (

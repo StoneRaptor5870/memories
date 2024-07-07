@@ -19,10 +19,20 @@ import { useNavigate } from "react-router-dom";
 import { deletePost, likePost } from "../../../actions/posts";
 import useStyles from "./styles";
 
+const arrayBufferToBase64 = (buffer) => {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+};
+
 const Post = ({ post, setCurrentId }) => {
   const dispatch = useDispatch();
   const classes = useStyles();
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("profile"));
   const [likes, setLikes] = useState(post?.likes);
 
@@ -69,16 +79,17 @@ const Post = ({ post, setCurrentId }) => {
     );
   };
 
-  const openPost = () => Navigate(`/posts/${post._id}`);
+  const openPost = () => navigate(`/posts/${post._id}`);
+
+  const base64Image = post.selectedFile?.data?.data
+    ? `data:${post.selectedFile.contentType};base64,${arrayBufferToBase64(post.selectedFile.data.data)}`
+    : "https://user-images.githubusercontent.com/194400/49531010-48dad180-f8b1-11e8-8d89-1e61320e1d82.png";
 
   return (
     <Card className={classes.card} raised elevation={6}>
       <CardMedia
         className={classes.media}
-        image={
-          post.selectedFile ||
-          "https://user-images.githubusercontent.com/194400/49531010-48dad180-f8b1-11e8-8d89-1e61320e1d82.png"
-        }
+        image={base64Image}
         title={post.title}
         onClick={openPost}
       />
